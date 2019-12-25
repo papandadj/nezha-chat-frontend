@@ -3,12 +3,20 @@
     <div class="curtain">
       <div class="sidebar">
         <Profile></Profile>
-        <List></List>
+        <List @changeMainAddUser="changeMainAddUser"></List>
+      </div>
+
+      <div v-if="false" class="main">
+        <Message></Message>
+        <InputText></InputText>
       </div>
 
       <div class="main">
-        <Message></Message>
-        <InputText></InputText>
+        <UserInfo
+          v-bind:img="mainAddUser.img"
+          v-bind:username="mainAddUser.username"
+          v-bind:id="mainAddUser.id"
+        ></UserInfo>
       </div>
     </div>
   </div>
@@ -17,21 +25,36 @@
 <script>
 import Profile from "./Profile";
 import List from "./List";
-import { actions } from "../../store";
 import Message from "./Message";
 import InputText from "./InputText";
+import UserInfo from "./UserInfo";
 
 export default {
-  vuex: {
-    actions: actions
-  },
-
   name: "ChatRoom",
   components: {
     Profile,
     List,
     Message,
-    InputText
+    InputText,
+    UserInfo
+  },
+  data() {
+    return {
+      liftSelector: "all",
+      inputText: "",
+      mainAddUser: {
+        img: "",
+        username: "",
+        id: ""
+      }
+    };
+  },
+  methods: {
+    changeMainAddUser(info) {
+      this.mainAddUser.img = info.img;
+      this.mainAddUser.username = info.username;
+      this.mainAddUser.id = info.id;
+    }
   }
 };
 </script>

@@ -1,18 +1,18 @@
 <template>
   <div class="profile">
-    <img class="avatar" src="@/assets/default-user.png" alt height="40px" width="40px" />
-    <p class="name">papanda</p>
+    <img class="avatar" :src="profile.imgUrl" />
+    <p class="name">{{profile.name}}</p>
 
-    <input class="search-input" type="text" placeholder="请输入用户" />
+    <input class="search-input" type="text" v-model="inputText" placeholder="请输入用户" />
 
     <div class="footer">
       <div class="footer-item">
-        <a class="link" href>
+        <a class="link" v-on:click="getFriend">
           <div class="iconfont userlist-icon">&#xe6bd;</div>
         </a>
       </div>
       <div class="footer-item">
-        <a class="link" href>
+        <a class="link" v-on:click="getAllUser">
           <div class="iconfont all-user">&#xe6ad;</div>
         </a>
       </div>
@@ -21,8 +21,64 @@
 </template>
 
 <script>
+const axios = require("axios");
+// import { mapMutations } from "vuex";
+
 export default {
-  name: "Profile"
+  name: "Profile",
+  data() {
+    return {
+      profile: {
+        imgUrl: "",
+        name: "",
+        id: ""
+      },
+      inputText: "",
+      barSelector: "left"
+    };
+  },
+  mounted() {
+    axios.defaults.headers.common["token"] = this.getToken();
+    axios
+      .post("http://localhost:9500/get", {})
+      .then(response => {
+        if (response.status === 200) {
+          this.profile.name = response.data.username;
+          this.profile.imgUrl =
+            response.data.img || "http://papanda.tk:3000/nezha1.png";
+          this.id = response.id;
+        }
+      })
+      .catch(error => {
+        console.log(error.response);
+      });
+  },
+  methods: {
+    getToken() {
+      return this.$store.getters.token;
+    },
+    getFriend() {
+      console.log("into get friend");
+    },
+    getAllUser() {
+      axios.defaults.headers.common["token"] = this.getToken();
+      if (this.inputText === "") {
+        alert("请输入用户");
+        return;
+      }
+      axios
+        .post("http://localhost:9500/get_list", { name: this.inputText })
+        .then(response => {
+          if (response.status === 200) {
+            console.log(response.data);
+            this.$store.commit("setSideRight", response.data.list);
+          }
+        })
+        .catch(error => {
+          console.log(error.response);
+        });
+    }
+  }
 };
 </script>
 
@@ -39,6 +95,8 @@ export default {
 
   .avatar {
     border-radius: 1000px;
+    height: 40px;
+    width: 40px;
   }
 
   .name {
@@ -50,9 +108,10 @@ export default {
   .search-input {
     padding: 0 5px;
     margin: 10px 0px;
-    height: 30px;
-    width: 210px;
+    height: 35px;
+    width: 100%;
     border-radius: 4px;
+    clear: both;
   }
 
   .footer {

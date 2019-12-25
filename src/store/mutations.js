@@ -1,25 +1,14 @@
 export default {
-  INIT_DATA(state) {
-    let data = localStorage.getItem('vue-chat-session');
-    if (data) {
-      state.sessions = JSON.parse(data);
+  setToken(state, token) {
+    state.token = token
+    localStorage.setItem("nezha-token", token);
+  },
+  setSideRight(state, users) {
+    if (typeof users === 'object') {
+      state.sideRight = []
+      for (let i = 0; i < users.length; i++) {
+        state.sideRight.push({ img: users[i].img || state.defaultImage, username: users[i].username, id: users[i].id })
+      }
     }
-  },
-  // 发送消息
-  SEND_MESSAGE({ sessions, currentSessionId }, content) {
-    let session = sessions.find(item => item.id === currentSessionId);
-    session.messages.push({
-      content: content,
-      date: new Date(),
-      self: true
-    });
-  },
-  // 选择会话
-  SELECT_SESSION(state, id) {
-    state.currentSessionId = id;
-  },
-  // 搜索
-  SET_FILTER_KEY(state, value) {
-    state.filterKey = value;
   }
 }

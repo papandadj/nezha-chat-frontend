@@ -1,21 +1,40 @@
 <template>
   <div class="list">
-    <ul class="list-ul">
-      <li v-for="item in sessions" @click="selectsessions(item.id)" :key="item.id">
-        <img class="avatar" :src="item.img" :alt="item.name" />
-        <p class="name">{{item.name}}</p>
+    <ul v-show="barRight" class="list-ul">
+      <li v-for="item in sideRight" @click="barRightClick(item)" :key="item.id">
+        <img class="avatar" :src="item.img" :alt="item.username" />
+        <span class="name">{{item.username}}</span>
+      </li>
+    </ul>
+
+    <ul v-show="!barRight" class="list-ul">
+      <li v-for="item in sideLeft" @click="selectsessions(item.id)" :key="item.id">
+        <img class="avatar" :src="item.img" :alt="item.username" />
+        <span class="name">{{item.username}}</span>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
-import store from "../../store";
 export default {
   name: "List",
   computed: {
-    sessions() {
-      return store.state.sessions;
+    sideRight() {
+      return this.$store.getters.sideRight;
+    },
+    sideLeft() {
+      return this.$store.getters.sideLeft;
+    }
+  },
+  data() {
+    return {
+      barRight: true
+    };
+  },
+  methods: {
+    barRightClick(info) {
+      this.$emit("changeMainAddUser", info);
     }
   }
 };
@@ -24,18 +43,22 @@ export default {
 <style lang="stylus" scoped>
 .list {
   text-align: left;
+  overflow-y: scroll;
+  height: 650px;
 
   .list-ul {
     padding: 0 0;
 
     li {
       text-align: left;
+      color: white;
       box-sizing: border-box;
       padding: 12px 15px;
       height: 65px;
       border-bottom: 2px solid #292C33;
       transition: background-color 0.1s;
       list-style: none;
+      overflow: hidden;
 
       &:hover {
         background-color: rgba(255, 255, 255, 0.03);
@@ -46,16 +69,17 @@ export default {
       }
 
       &:first-child {
-        border-top: 2px solid #292C33;
+        border-top: 1px solid #292C33;
       }
 
       .name {
-        display: inline;
-        padding: 0px 20px;
+        height: 40px;
+        margin-left: 20px;
       }
 
       .avatar {
         vertical-align: middle;
+        float: left;
         height: 40px;
         width: 40px;
         border-radius: 3px;
