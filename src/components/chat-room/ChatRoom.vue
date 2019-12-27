@@ -2,16 +2,22 @@
   <div class="curtain-background">
     <div class="curtain">
       <div class="sidebar">
-        <Profile></Profile>
-        <List @changeMainAddUser="changeMainAddUser"></List>
+        <Profile @changeSideBarRight="changeSideBarRight" @changeSideBarLeft="changeSideBarLeft"></Profile>
+        <List
+          @changeMainAddUser="changeMainAddUser"
+          @changeMainChat="changeMainChat"
+          :sideBarRight="sideBarRight"
+          :friend="friend"
+          :key="sideBarRight"
+        ></List>
       </div>
 
-      <div v-if="false" class="main">
-        <Message></Message>
-        <InputText></InputText>
+      <div v-if="mainType==='chat'" class="main">
+        <Message :friend="friend"></Message>
+        <InputText :friend="friend" :key="friend.id"></InputText>
       </div>
 
-      <div class="main">
+      <div v-if="mainType==='info'" class="main">
         <UserInfo
           v-bind:img="mainAddUser.img"
           v-bind:username="mainAddUser.username"
@@ -28,6 +34,7 @@ import List from "./List";
 import Message from "./Message";
 import InputText from "./InputText";
 import UserInfo from "./UserInfo";
+const axios = require("axios");
 
 export default {
   name: "ChatRoom",
@@ -40,8 +47,10 @@ export default {
   },
   data() {
     return {
-      liftSelector: "all",
       inputText: "",
+      sideBarRight: false,
+      mainType: "",
+      friend: {},
       mainAddUser: {
         img: "",
         username: "",
@@ -51,10 +60,59 @@ export default {
   },
   methods: {
     changeMainAddUser(info) {
+      this.mainType = "info";
       this.mainAddUser.img = info.img;
       this.mainAddUser.username = info.username;
       this.mainAddUser.id = info.id;
+    },
+    changeMainChat(info) {
+      this.mainType = "chat";
+      this.friend = info;
+      console.log(info);
+    },
+
+    changeSideBarRight() {
+      this.mainType = "";
+      this.sideBarRight = true;
+    },
+    changeSideBarLeft() {
+      this.mainType = "";
+      this.sideBarRight = false;
     }
+  },
+  mounted: function() {
+    let that = this;
+
+    axios
+      .post("http://localhost:9503/get_queue", {})
+      .then(response => {
+        if (response.status === 200) {
+          let queue = response.data.queue;
+
+          let ws = new WebSocket("ws://localhost:15674/ws");
+          // eslint-disable-next-line
+          let client = Stomp.over(ws);
+          client.heartbeat.outgoing = 20000;
+          client.heartbeat.incoming = 0;
+
+          let onConnect = function(x) {
+            client.subscribe(queue, function(data) {
+              console.log("receive rabbit data : ", data.body);
+              let body = JSON.parse(data.body);
+              that.$store.commit("setChatRecords", body);
+            });
+          };
+
+          let onError = function(err) {
+            console.log("error: ", err);
+          };
+
+          client.connect("guest", "guest", onConnect, onError, "/");
+        }
+      })
+      .catch(error => {
+        console.log(error.response);
+      });
   }
 };
 </script>

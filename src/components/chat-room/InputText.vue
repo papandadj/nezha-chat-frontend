@@ -1,12 +1,44 @@
 <template>
   <div class="input-text">
-    <textarea placeholder="请输入文字"></textarea>
-    <button class="send" type="button">发送</button>
+    <textarea placeholder="请输入文字" v-model="inputData"></textarea>
+    <button class="send" type="button" v-on:click="sendMessage">发送</button>
   </div>
 </template>
 <script>
+const axios = require("axios");
 export default {
-  name: "InputText"
+  name: "InputText",
+  props: ["friend"],
+  data() {
+    return {
+      inputData: ""
+    };
+  },
+  methods: {
+    getToken() {
+      return this.$store.getters.token;
+    },
+    sendMessage() {
+      axios.defaults.headers.common["token"] = this.getToken();
+      axios
+        .post("http://localhost:9503/post", {
+          user_id: this.friend.id,
+          message: this.inputData
+        })
+        .then(response => {
+          if (response.status === 200) {
+            this.$store.commit("setChatRecordsBySelf", {
+              friendId: this.friend.id,
+              message: this.inputData
+            });
+            this.inputData = "";
+          }
+        })
+        .catch(error => {
+          alert("发送失败", error);
+        });
+    }
+  }
 };
 </script>
 

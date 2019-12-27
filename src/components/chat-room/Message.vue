@@ -1,14 +1,11 @@
 <template>
-  <div class="message">
-    <ul v-if="sessions">
-      <li class="message-li" v-for="(item, index) in sessions[0].messages" :key="index">
+  <div class="message" id="scrollMessage">
+    <ul id="scrollUl">
+      <li class="message-li" v-for="(item, index) in chatRecord" :key="index">
         <div class="time">{{item.date | time}}</div>
-        <div class="content">
-          <img class="avatar" :src="item.self ? user.img :  sessions[0].img" />
-          <div class="content-data">
-            <span class="triangle_border_left"></span>
-            {{item.content}}
-          </div>
+        <div class="content" :class="{self: item.self}">
+          <img class="avatar" :src="item.self ? user.imgUrl :  friend.img" />
+          <div class="content-data">{{item.message}}</div>
         </div>
       </li>
     </ul>
@@ -16,32 +13,53 @@
 </template>
 
 <script>
-import store from "../../store";
 export default {
   name: "Message",
+  props: ["friend"],
   computed: {
-    sessions() {
-      return store.state.sessions;
+    chatRecord() {
+      let record = this.$store.getters.chatRecord(this.friend.id);
+      console.log(record);
+      if (!record) {
+        return [];
+      }
+      return record.data;
     },
     user() {
-      return store.state.user;
+      return this.$store.getters.user;
+    }
+  },
+  watch: {
+    chatRecord() {
+      setTimeout(() => {
+        this.toTop();
+      }, 100);
     }
   },
   filters: {
     // 将日期过滤为 hour:minutes
     time(date) {
       if (typeof date === "string") {
-        date = new Date(date);
+        date = date.slice(0, -6);
+        date = new Date(parseInt(date));
       }
       return date.getHours() + ":" + date.getMinutes();
     }
+  },
+  methods: {
+    toTop() {
+      var objDiv = document.getElementById("scrollMessage");
+      objDiv.scrollTop = objDiv.scrollHeight;
+    }
+  },
+  mounted() {
+    this.toTop();
   }
 };
 </script>
 
 <style lang="stylus" scoped>
 .message {
-  box-sizing: border-box;
   background-color: #e8edf2;
   padding: 15px;
   overflow-y: scroll;
@@ -53,46 +71,66 @@ export default {
       list-style: none;
 
       .time {
-        margin: 7px;
+        margin: 20px;
         padding: 0 18px;
         font-size: 12px;
         color: black;
         border-radius: 2px;
+        display: block;
       }
 
       .content {
-        display: flex;
+        text-align: left;
 
         .avatar {
+          display: inline-block;
           height: 40px;
           width: 40px;
-          float: left;
-          min-width: 40px;
-          border-radius: 2px;
-          margin: 0 10px;
+          margin: 0 10px 0 0;
+          border-radius: 3px;
         }
 
         .content-data {
-          position: relative;
-          background-color: #52ca3b;
-          font-size: 16px;
           display: inline-block;
+          position: relative;
           padding: 0 10px;
           min-height: 30px;
+          max-width: 600px;
+          line-height: 2.5;
+          font-size: 14px;
           text-align: left;
-          border-radius: 5px;
           word-break: break-all;
+          background-color: white;
+          border-radius: 4px;
+
+          &:before {
+            content: ' ';
+            position: absolute;
+            top: 9px;
+            right: 100%;
+            border: 6px solid transparent;
+            border-right-color: white;
+          }
+        }
+      }
+
+      .self {
+        text-align: right;
+
+        .avatar {
+          float: right;
+          margin: 0 0 0 10px;
         }
 
-        .triangle_border_left {
-          width: 0;
-          height: 0;
-          border-width: 3px 6px 3px;
-          border-style: solid;
-          border-color: transparent #52ca3b transparent transparent; /* 透明 灰 透明 透明 */
-          position: absolute;
-          left: -10px;
-          top: 12px;
+        .content-data {
+          background-color: greenYellow;
+
+          &:before {
+            right: inherit;
+            left: 100%;
+            border-right-color: transparent;
+            border-left-color: greenYellow;
+          }
         }
       }
     }

@@ -22,7 +22,6 @@
 
 <script>
 const axios = require("axios");
-// import { mapMutations } from "vuex";
 
 export default {
   name: "Profile",
@@ -46,7 +45,9 @@ export default {
           this.profile.name = response.data.username;
           this.profile.imgUrl =
             response.data.img || "http://papanda.tk:3000/nezha1.png";
-          this.id = response.id;
+          this.id = response.data.id;
+
+          this.$store.commit("setUser", this.profile);
         }
       })
       .catch(error => {
@@ -58,7 +59,18 @@ export default {
       return this.$store.getters.token;
     },
     getFriend() {
-      console.log("into get friend");
+      axios.defaults.headers.common["token"] = this.getToken();
+      axios
+        .post("http://localhost:9501/get_list", { name: this.inputText })
+        .then(response => {
+          if (response.status === 200) {
+            this.$emit("changeSideBarLeft");
+            this.$store.commit("setSideLeft", response.data.list);
+          }
+        })
+        .catch(error => {
+          console.log(error.response);
+        });
     },
     getAllUser() {
       axios.defaults.headers.common["token"] = this.getToken();
@@ -70,7 +82,7 @@ export default {
         .post("http://localhost:9500/get_list", { name: this.inputText })
         .then(response => {
           if (response.status === 200) {
-            console.log(response.data);
+            this.$emit("changeSideBarRight");
             this.$store.commit("setSideRight", response.data.list);
           }
         })

@@ -1,14 +1,14 @@
 <template>
   <div class="list">
-    <ul v-show="barRight" class="list-ul">
+    <ul v-show="sideBarRight" class="list-ul">
       <li v-for="item in sideRight" @click="barRightClick(item)" :key="item.id">
         <img class="avatar" :src="item.img" :alt="item.username" />
         <span class="name">{{item.username}}</span>
       </li>
     </ul>
 
-    <ul v-show="!barRight" class="list-ul">
-      <li v-for="item in sideLeft" @click="selectsessions(item.id)" :key="item.id">
+    <ul v-show="!sideBarRight" class="list-ul">
+      <li v-for="item in sideLeft" @click="barLeftClick(item)" :key="item.id">
         <img class="avatar" :src="item.img" :alt="item.username" />
         <span class="name">{{item.username}}</span>
       </li>
@@ -18,6 +18,7 @@
 
 <script>
 export default {
+  props: ["sideBarRight", "friend"],
   name: "List",
   computed: {
     sideRight() {
@@ -25,16 +26,24 @@ export default {
     },
     sideLeft() {
       return this.$store.getters.sideLeft;
+    },
+    chatRecords() {
+      return this.$store.getters.chatRecords;
     }
   },
+  watch: {
+    chatRecords() {}
+  },
   data() {
-    return {
-      barRight: true
-    };
+    return {};
   },
   methods: {
     barRightClick(info) {
       this.$emit("changeMainAddUser", info);
+    },
+    barLeftClick(info) {
+      console.log(info);
+      this.$emit("changeMainChat", info);
     }
   }
 };

@@ -16,11 +16,7 @@ export default {
   name: "UserInfo",
   props: ["img", "username", "id"],
   data: () => {
-    return {
-      img: this.img,
-      username: this.username,
-      id: this.id
-    };
+    return {};
   },
   methods: {
     getToken() {
@@ -36,11 +32,11 @@ export default {
         .post("http://localhost:9501/post", { user_id: this.id })
         .then(response => {
           if (response.status === 200) {
-            console.log(response.data);
+            alert("用户添加成功");
           }
         })
         .catch(error => {
-          console.log(error.response);
+          alert("用户添加失败", error);
         });
     }
   }
