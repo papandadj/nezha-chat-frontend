@@ -76,7 +76,7 @@ export default {
       this.sideBarRight = true;
     },
     changeSideBarLeft() {
-      this.mainType = "";
+      this.mainType = "chat";
       this.sideBarRight = false;
     }
   },

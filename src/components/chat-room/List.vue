@@ -1,13 +1,13 @@
 <template>
   <div class="list">
-    <ul v-show="sideBarRight" class="list-ul">
+    <ul v-if="sideBarRight" class="list-ul">
       <li v-for="item in sideRight" @click="barRightClick(item)" :key="item.id">
         <img class="avatar" :src="item.img" :alt="item.username" />
         <span class="name">{{item.username}}</span>
       </li>
     </ul>
 
-    <ul v-show="!sideBarRight" class="list-ul">
+    <ul v-if="!sideBarRight" class="list-ul">
       <li v-for="item in sideLeft" @click="barLeftClick(item)" :key="item.id">
         <img class="avatar" :src="item.img" :alt="item.username" />
         <span class="name">{{item.username}}</span>
@@ -32,10 +32,16 @@ export default {
     }
   },
   watch: {
-    chatRecords() {}
+    chatRecords() {
+      this.sideBarRight = !this.sideBarRight;
+      this.sideBarRight = !this.sideBarRight;
+      this.barLeftClick(this.sideLeft[0]);
+    }
   },
   data() {
-    return {};
+    return {
+      currentSideBarRight: false
+    };
   },
   methods: {
     barRightClick(info) {

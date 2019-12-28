@@ -48,6 +48,7 @@ export default {
           this.id = response.data.id;
 
           this.$store.commit("setUser", this.profile);
+          this.getFriend();
         }
       })
       .catch(error => {
@@ -74,10 +75,6 @@ export default {
     },
     getAllUser() {
       axios.defaults.headers.common["token"] = this.getToken();
-      if (this.inputText === "") {
-        alert("请输入用户");
-        return;
-      }
       axios
         .post("http://localhost:9500/get_list", { name: this.inputText })
         .then(response => {

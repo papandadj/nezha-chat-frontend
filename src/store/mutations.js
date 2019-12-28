@@ -1,3 +1,16 @@
+function changeChatRecords(state) {
+  state.chatRecords.forEach((chatRecord, chatRecordIndex) => {
+    let sender = chatRecord.sender
+    state.sideLeft.forEach((sideLiftItem, index, sideLift) => {
+      if (sender === sideLiftItem.id) {
+        let swap = sideLift[chatRecordIndex]
+        sideLift[chatRecordIndex] = sideLift[index]
+        sideLift[index] = swap
+      }
+    })
+  })
+}
+
 export default {
   setToken(state, token) {
     state.token = token
@@ -23,6 +36,7 @@ export default {
         state.sideLeft.push({ img: users[i].img || state.defaultImage, username: users[i].username, id: users[i].id })
       }
     }
+    changeChatRecords(state)
   },
 
   setChatRecords(state, body) {
@@ -48,7 +62,7 @@ export default {
         data: [body]
       })
     }
-    console.log(state.chatRecords)
+    changeChatRecords(state)
   },
   setChatRecordsBySelf(state, { friendId, message }) {
     let find = false
@@ -77,7 +91,7 @@ export default {
         }]
       })
     }
-    console.log(state.chatRecords)
+    changeChatRecords(state)
   }
 
 }
