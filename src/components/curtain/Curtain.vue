@@ -11,8 +11,6 @@
 </template>
 
 <script>
-const axios = require("axios");
-
 export default {
   name: "Curtain",
   data() {
@@ -41,7 +39,7 @@ export default {
   },
 
   mounted() {
-    axios.post("http://localhost:9502/get_home_img").then(response => {
+    this.$CommonService.post("get_home_img").then(response => {
       if (response.status === 200) {
         response.data.list.forEach(item => {
           let wh = Math.random();

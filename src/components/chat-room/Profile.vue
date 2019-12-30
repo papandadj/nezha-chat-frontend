@@ -21,8 +21,6 @@
 </template>
 
 <script>
-const axios = require("axios");
-
 export default {
   name: "Profile",
   data() {
@@ -37,14 +35,12 @@ export default {
     };
   },
   mounted() {
-    axios.defaults.headers.common["token"] = this.getToken();
-    axios
-      .post("http://localhost:9500/get", {})
+    this.$UserService
+      .post("get", {}, this.getToken())
       .then(response => {
         if (response.status === 200) {
           this.profile.name = response.data.username;
-          this.profile.imgUrl =
-            response.data.img || "http://papanda.tk:3000/nezha1.png";
+          this.profile.imgUrl = response.data.img || this.$DefaultURL;
           this.id = response.data.id;
 
           this.$store.commit("setUser", this.profile);
@@ -60,9 +56,14 @@ export default {
       return this.$store.getters.token;
     },
     getFriend() {
-      axios.defaults.headers.common["token"] = this.getToken();
-      axios
-        .post("http://localhost:9501/get_list", { name: this.inputText })
+      this.$FriendService
+        .post(
+          "get_list",
+          {
+            name: this.inputText
+          },
+          this.getToken()
+        )
         .then(response => {
           if (response.status === 200) {
             this.$emit("changeSideBarLeft");
@@ -74,9 +75,8 @@ export default {
         });
     },
     getAllUser() {
-      axios.defaults.headers.common["token"] = this.getToken();
-      axios
-        .post("http://localhost:9500/get_list", { name: this.inputText })
+      this.$UserService
+        .post("get_list", { name: this.inputText }, this.getToken())
         .then(response => {
           if (response.status === 200) {
             this.$emit("changeSideBarRight");

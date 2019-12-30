@@ -5,7 +5,6 @@
   </div>
 </template>
 <script>
-const axios = require("axios");
 export default {
   name: "InputText",
   props: ["friend"],
@@ -19,9 +18,8 @@ export default {
       return this.$store.getters.token;
     },
     sendMessage() {
-      axios.defaults.headers.common["token"] = this.getToken();
-      axios
-        .post("http://localhost:9503/post", {
+      this.$ChatService
+        .post("post", {
           user_id: this.friend.id,
           message: this.inputData
         })

@@ -34,7 +34,6 @@ import List from "./List";
 import Message from "./Message";
 import InputText from "./InputText";
 import UserInfo from "./UserInfo";
-const axios = require("axios");
 
 export default {
   name: "ChatRoom",
@@ -83,13 +82,13 @@ export default {
   mounted: function() {
     let that = this;
 
-    axios
-      .post("http://localhost:9503/get_queue", {})
+    this.$ChatService
+      .post("get_queue", {})
       .then(response => {
         if (response.status === 200) {
           let queue = response.data.queue;
 
-          let ws = new WebSocket("ws://localhost:15674/ws");
+          let ws = new WebSocket(this.$SocketURL);
           // eslint-disable-next-line
           let client = Stomp.over(ws);
           client.heartbeat.outgoing = 20000;
@@ -107,7 +106,13 @@ export default {
             console.log("error: ", err);
           };
 
-          client.connect("guest", "guest", onConnect, onError, "/");
+          client.connect(
+            this.$SocketAccount,
+            this.$SocketPassword,
+            onConnect,
+            onError,
+            "/"
+          );
         }
       })
       .catch(error => {

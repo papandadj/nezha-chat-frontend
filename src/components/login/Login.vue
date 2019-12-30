@@ -40,7 +40,6 @@
 <script>
 import Loading from "common/loading.vue";
 import Curtain from "../curtain/Curtain.vue";
-const axios = require("axios");
 
 export default {
   name: "Login",
@@ -77,8 +76,8 @@ export default {
     },
     singin() {
       this.loading = true;
-      axios
-        .post("http://localhost:9500/sign_up", {
+      this.$UserService
+        .post("sign_up", {
           username: this.account,
           password: this.password
         })
@@ -102,8 +101,8 @@ export default {
     },
     login() {
       this.loading = true;
-      axios
-        .post("http://localhost:9500/login", {
+      this.$UserService
+        .post("login", {
           username: this.account,
           password: this.password
         })

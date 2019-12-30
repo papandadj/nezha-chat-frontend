@@ -10,8 +10,6 @@
 </template>
 
 <script>
-const axios = require("axios");
-
 export default {
   name: "UserInfo",
   props: ["img", "username", "id"],
@@ -23,13 +21,8 @@ export default {
       return this.$store.getters.token;
     },
     AddUser() {
-      axios.defaults.headers.common["token"] = this.getToken();
-      if (this.inputText === "") {
-        alert("请输入用户");
-        return;
-      }
-      axios
-        .post("http://localhost:9501/post", { user_id: this.id })
+      this.$FriendService
+        .post("post", { user_id: this.id }, this.getToken())
         .then(response => {
           if (response.status === 200) {
             alert("用户添加成功");
